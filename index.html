@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Секретное Досье - Система Доступа</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Courier New', 'Monaco', monospace;
+        }
+        
+        body {
+            background-color: #000;
+            color: #00aaff;
+            overflow: hidden;
+            height: 100vh;
+        }
+        
+        .terminal {
+            width: 100%;
+            height: 100vh;
+            background-color: #000000;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .access-container {
+            background-color: #000;
+            border: 2px solid #0e6700;
+            padding: 40px;
+            width: 90%;
+            max-width: 700px;
+            box-shadow: 0 0 20px #0e6700;
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            border-radius: 0;
+        }
+        
+        .classified-banner {
+            font-size: 1.8rem;
+            letter-spacing: 8px;
+            color: #ff0000;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            border: 1px solid #ff0000;
+            padding: 10px;
+            background-color: rgba(255, 0, 0, 0.05);
+        }
+        
+        .title {
+            font-size: 2.5rem;
+            color: #0e6700;
+            margin-bottom: 10px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: #00ff00;
+            margin-bottom: 30px;
+            letter-spacing: 2px;
+            
+        }
+        
+        .clearance-level {
+            background-color: #000;
+            border: 1px solid #ff0000;
+            padding: 15px;
+            margin: 30px 0;
+        }
+        
+        .clearance-text {
+            color: #ff0000;
+            font-size: 1.3rem;
+            letter-spacing: 2px;
+        }
+        
+        .access-instructions {
+            color: #888;
+            font-size: 1.1rem;
+            margin: 25px 0;
+            line-height: 1.6;
+            border: 1px solid #005588;
+            padding: 15px;
+            background-color: rgba(0, 85, 136, 0.05);
+        }
+        
+        .continue-btn {
+            background-color: #000;
+            color: #00ff00;
+            border: 2px solid #00ff00;
+            padding: 15px 40px;
+            font-size: 1.3rem;
+            cursor: pointer;
+            margin-top: 30px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            transition: all 0.2s;
+            position: relative;
+        }
+        
+        .continue-btn:hover {
+            background-color: rgba(0, 170, 255, 0.1);
+            box-shadow: 0 0 15px rgba(0, 170, 255, 0.3);
+        }
+        
+        .continue-btn:active {
+            background-color: rgba(0, 170, 255, 0.2);
+        }
+        
+        .countdown {
+            color: #ffffff;
+            margin-top: 20px;
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+        
+        .status-line {
+            color: #00ff00;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            height: 20px;
+            border: 1px solid #008800;
+            padding: 5px 10px;
+            background-color: rgba(0, 128, 0, 0.05);
+        }
+        
+        .contract-page {
+            display: none;
+            width: 100%;
+            height: 100vh;
+            overflow-y: auto;
+            background-color: #0a0e17;
+            color: #d1d9e6;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        /* КОНТРАКТ стили ватафа */
+        .contract-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: #111827;
+            padding: 30px;
+            border-left: 1px solid #1e40af;
+            border-right: 1px solid #1e40af;
+        }
+        
+        .contract-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #1e40af;
+            gap: 30px;
+        }
+        
+        .logo-container {
+            flex-shrink: 0;
+        }
+        
+        .logo {
+            width: 120px;
+            height: 120px;
+            border: 2px solid #1e40af;
+            object-fit: cover;
+            background-color: #0f172a;
+            padding: 5px;
+        }
+        
+        .header-content {
+            flex: 1;
+        }
+        
+        .contract-title {
+            color: #e2e8f0;
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .contract-info {
+            color: #94a3b8;
+            font-size: 1rem;
+            margin-bottom: 20px;
+        }
+        
+        .contract-section {
+            margin-bottom: 30px;
+            padding-left: 20px;
+            border-left: 2px solid #1e293b;
+        }
+        
+        .contract-section h2 {
+            color: #e2e8f0;
+            border-bottom: 1px solid #1e293b;
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+            margin-left: -20px;
+            padding-left: 20px;
+        }
+        
+        .contract-section ul {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .contract-section li {
+            margin-bottom: 8px;
+            position: relative;
+            padding-left: 15px;
+        }
+        
+        .contract-section li:before {
+            content: ">";
+            position: absolute;
+            left: 0;
+            color: #1e40af;
+        }
+        
+        .signature-area {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #1e293b;
+        }
+        
+        .signature-line {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+        
+        .signature-box {
+            flex: 1;
+            margin: 0 10px;
+        }
+        
+        .signature-label {
+            color: #94a3b8;
+            margin-bottom: 5px;
+        }
+        
+        .signature-space {
+            height: 1px;
+            background-color: #94a3b8;
+            margin-top: 5px;
+        }
+        
+        .return-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #1e40af;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 0;
+            cursor: pointer;
+            z-index: 100;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .audio-status {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            color: #00aaff;
+            font-size: 0.9rem;
+            z-index: 100;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 5px 10px;
+            border: 1px solid #00aaff;
+        }
+        
+        .section-divider {
+            height: 1px;
+            background-color: #1e293b;
+            margin: 30px 0;
+        }
+        
+        @media (max-width: 768px) {
+            .access-container {
+                padding: 20px;
+            }
+            
+            .title {
+                font-size: 1.8rem;
+            }
+            
+            .classified-banner {
+                font-size: 1.3rem;
+                letter-spacing: 4px;
+            }
+            
+            .continue-btn {
+                padding: 12px 25px;
+                font-size: 1.1rem;
+            }
+            
+            .contract-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+            
+            .logo {
+                width: 100px;
+                height: 100px;
+            }
+        }
+        
+        .code-display {
+            background-color: #000;
+            border: 1px solid #00aaff;
+            padding: 10px;
+            margin: 10px 0;
+            font-family: monospace;
+            letter-spacing: 2px;
+        }
+    </style>
+</head>
+<body>
+    <!--страница доступа ватафа пепе-->
+    <div id="accessPage" class="terminal">
+        <div class="access-container">
+            <div class="classified-banner">⚠️ СОВЕРШЕННО СЕКРЕТНО</div>
+            
+            <div class="subtitle">ВОЕННАЯ РАЗВЕДЫВАТЕЛЬНАЯ СЕТЬ</div>
+    
+            <div id="statusLine" class="status-line">СИСТЕМА ГОТОВА К АУТЕНТИФИКАЦИИ</div>
+            
+            <button id="continueBtn" class="continue-btn">ПОДТВЕРДИТЬ ДОСТУП</button>
+            
+            <div class="countdown" id="countdown">АВТОМАТИЧЕСКИЙ ВЫХОД ЧЕРЕЗ: <span id="timer">30</span>с</div>
+        </div>
+    </div>
+    
+    <!-- Страница контракта шнене -->
+    <div id="contractPage" class="contract-page">
+        <div class="contract-container">
+            <div class="contract-header">
+                <div class="logo-container">
+                    <img src="amg.png" 
+                         alt="Логотип AMG" class="logo" id="logoImage"
+                         onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgdmlld0JveD0iMCAwIDEyMCAxMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMjAiIGZpbGw9IiMwZjE3MmEiLz48cGF0aCBkPSJNMzAgNDBINzBMNjAgODBINTBMMzUgNjBINDBMNDUgNDBINTBMNDAgNjBIMzVMMzAgNDBaIiBmaWxsPSIjMWU0MGFmIi8+PHRleHQgeD0iNjAiIHk9IjEwNSIgdGV4dC1hbmNob3I9ImVuZCIgZmlsbD0iI2YxZjVmOSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0IiBmb250LXdlaWdodD0iYm9sZCI+QU1HPC90ZXh0Pjwvc3ZnPg=='">
+                </div>
+                
+                <div class="header-content">
+                    <h1 class="contract-title">FORCE OF SPECIAL OPERATIONS</h1>
+                    <div class="contract-info">
+                        <div>КОД: <span id="contractCode">_FSO_</span><span id="codeNumber">0000</span></div>
+                        <div>ДАТА: <span id="currentDate"></span></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="contract-section">
+                <h2>1. СУТЬ СОГЛАШЕНИЯ</h2>
+                <p>Вы зачисляетесь в оперативный состав для выполнения задач в рамках частной операции на территории ЧЗО. Ваша работа – не геройство, а точное выполнение поставленных задач в составе профессиональной команды. Выживание и успех являются частью рабочего процесса.</p>
+            </div>
+            
+            <div class="section-divider"></div>
+            
+            <div class="contract-section">
+                <h2>2. ВАШИ ОБЯЗАННОСТИ</h2>
+                <ul>
+                    <li>Безусловное подчинение действующим Правилам Контракта и приказам назначенного командира.</li>
+                    <li>Выполнение функций в соответствии с полученной на месте ролью.</li>
+                    <li>Поддержание в исправном состоянии выданного имущества.</li>
+                    <li>Соблюдение режима молчания и маскировки в ходе активной фазы операции.</li>
+                </ul>
+            </div>
+            
+            <div class="section-divider"></div>
+            
+            <div class="contract-section">
+                <h2>3. НАШИ ОБЯЗАННОСТИ И ГАРАНТИИ</h2>
+                
+                <h3 style="color: #88aaff; margin-top: 15px;">Команда</h3>
+                <p>Вы будете работать вместе с лучшими. Наши кадры — это профессионалы, отобранные по опыту и психотипу. Здесь нет места авантюристам или фанатикам. Только расчет и взаимное прикрытие.</p>
+                
+                <h3 style="color: #88aaff; margin-top: 15px;">Оснащение</h3>
+                <p>Мы предоставляем современное снаряжение и экипировку, соответствующее стандартам сил специального назначения. Вы получаете инструмент, а не обузу.</p>
+                
+                <h3 style="color: #88aaff; margin-top: 15px;">Управление и поддержка</h3>
+                <p>Каждая операция имеет четкий план, тактическую поддержку с командного пункта и канал для экстренной эвакуации, если ситуация позволяет.</p>
+                
+                <h3 style="color: #88aaff; margin-top: 15px;">Оплата</h3>
+                <p>Деньги платятся по факту. После завершения срока контракта. Всё честно. Мы видим результат — вы получаете вознаграждение. Размер оплаты определяется сложностью, результативностью и сохранностью имущества.</p>
+            </div>
+            
+            <div class="section-divider"></div>
+            
+            <div class="contract-section">
+                <h2>4. УСЛОВИЯ И РИСКИ</h2>
+                <ul>
+                    <li>Настоящим вы подтверждаете, что осведомлены о характере территории проведения ЧЗО, включая, но не ограничиваясь: криминогенной, радиационной, химической и неклассифицированной аномальной обстановкой.</li>
+                    <li>"***********" обеспечивает страховку по стандартной схеме для высокорисковых регионов. Подробности — у юридического отдела.</li>
+                    <li>Контракт действует на срок конкретной операции и может быть расторгнут в одностороннем порядке в случае нарушения вами его условий, что ведет к нулевой оплате.</li>
+                </ul>
+            </div>
+            
+            <div class="section-divider"></div>
+            
+            <div class="signature-area">
+                <h2>5. АКЦЕПТ</h2>
+                <p>Я, ______, подтверждаю, что полностью понимаю суть предстоящей работы, действующие правила, принимаю все сопутствующие риски и не имею психических/физических противопоказаний для такой деятельности.</p>
+                
+                <div class="signature-line">
+                    <div class="signature-box">
+                        <div class="signature-label">Подпись</div>
+                        <div class="signature-space"></div>
+                        <div class="signature-label">______/ (ваша подпись)</div>
+                    </div>
+                    <div class="signature-box">
+                        <div class="signature-label">Дата подписания</div>
+                        <div class="signature-space"></div>
+                        <div class="signature-label" id="signatureDate"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+    
+    <audio id="bgAudio" loop preload="auto">
+        <source src="disco.mp3" type="audio/mpeg">
+        Ваш браузер не поддерживает аудио элемент.
+    </audio>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOMчик
+            const accessPage = document.getElementById('accessPage');
+            const contractPage = document.getElementById('contractPage');
+            const continueBtn = document.getElementById('continueBtn');
+            const returnBtn = document.getElementById('returnBtn');
+            const statusLine = document.getElementById('statusLine');
+            const timerElement = document.getElementById('timer');
+            const audioStatus = document.getElementById('audioStatus');
+            
+            // Контрик
+            const contractCodeElement = document.getElementById('contractCode');
+            const codeNumberElement = document.getElementById('codeNumber');
+            const currentDateElement = document.getElementById('currentDate');
+            const signatureDateElement = document.getElementById('signatureDate');
+            
+
+            const bgAudio = document.getElementById('bgAudio');
+            bgAudio.volume = 0.1;
+            
+            let countdown = 30;
+            let countdownInterval;
+            let audioStarted = false;
+            
+            // Статик коды
+            const codePrefixes = ['FSO', 'SOP', 'CTR', 'OPR', 'MSC', 'TAC', 'SEC', 'INT'];
+            
+            // Доата
+            function formatDate(date) {
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = 2014; // Фиксированный 2014 год
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    
+    return `${day}.${month}.${year} ${hours}:${minutes}`;
+}
+            
+            // Подпись даты
+            function formatSignatureDate(date) {
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = 2014; // Фиксированный 2014 год
+    
+    return `${day}.${month}.${year}`;
+}
+            
+            // Функция для генерации случайного кода
+            function generateContractCode() {
+
+                const randomPrefix = codePrefixes[Math.floor(Math.random() * codePrefixes.length)];
+                const randomNumber = Math.floor(1000 + Math.random() * 9000);
+                
+                // апдейт шнейне
+                contractCodeElement.textContent = `_${randomPrefix}_`;
+                codeNumberElement.textContent = randomNumber;
+                localStorage.setItem('contractCode', `${randomPrefix}${randomNumber}`);
+                localStorage.setItem('codeGenerationTime', new Date().toISOString());
+                
+                return `${randomPrefix}${randomNumber}`;
+            }
+            
+            // Нынешняя дата пэпэ
+            function setCurrentDate() {
+                const now = new Date();
+                currentDateElement.textContent = formatDate(now);
+                signatureDateElement.textContent = formatSignatureDate(now);
+                localStorage.setItem('contractDate', now.toISOString());
+            }
+            
+            function loadContractData() {
+                const savedCode = localStorage.getItem('contractCode');
+                const savedCodeTime = localStorage.getItem('codeGenerationTime');
+                
+                if (savedCode && savedCodeTime) {
+                    // Проверка на старость
+                    const codeTime = new Date(savedCodeTime);
+                    const now = new Date();
+                    const hoursDiff = (now - codeTime) / (1000 * 60 * 60);
+                    
+                    if (hoursDiff < 24) {
+                        const prefix = savedCode.substring(0, 3);
+                        const number = savedCode.substring(3);
+                        contractCodeElement.textContent = `_${prefix}_`;
+                        codeNumberElement.textContent = number;
+                    } else {
+                        generateContractCode();
+                    }
+                } else {
+
+                    generateContractCode();
+                }
+                
+                const savedDate = localStorage.getItem('contractDate');
+                if (savedDate) {
+                    const date = new Date(savedDate);
+                    currentDateElement.textContent = formatDate(date);
+                    signatureDateElement.textContent = formatSignatureDate(date);
+                } else {
+                    setCurrentDate();
+                }
+            }
+            function getRandomSong() {
+    //  число от 1 до 10
+    const randomSongNumber = Math.floor(Math.random() * 10) + 1;
+    
+    // рандом песенка
+    return `${randomSongNumber}.mp3`;
+}
+
+            function startMusic() {
+    if (!audioStarted) {
+        // Сет песни
+        const randomSong = getRandomSong();
+        bgAudio.src = randomSong;
+        
+        bgAudio.play().then(() => {
+            audioIndicator.textContent = "♪";
+            audioStarted = true;
+            
+        
+            setTimeout(() => {
+                audioIndicator.style.opacity = '0.7';
+            }, 1000);
+            
+            audioIndicator.title = `Песня №${randomSong.charAt(0)}`;
+            
+        }).catch(e => {
+            console.log("Автовоспроизведение заблокировано");
+            audioIndicator.textContent = "♪ (нажмите для звука)";
+            audioIndicator.style.cursor = "pointer";
+            
+            audioIndicator.addEventListener('click', function() {
+                bgAudio.play();
+                audioIndicator.textContent = "♪";
+                audioIndicator.style.cursor = "default";
+                audioStarted = true;
+            });
+        });
+    }
+}
+            
+            function authenticate() {
+                clearInterval(countdownInterval);
+                statusLine.textContent = "ПРОВЕРКА УРОВНЯ ДОСТУПА...";
+                        setTimeout(() => {
+                            statusLine.textContent = "ДОСТУП РАЗРЕШЕН";
+                            statusLine.style.color = "#00ff00";
+                            statusLine.style.borderColor = "#008800";
+                            const newCode = generateContractCode();
+                            setCurrentDate();
+
+                            startMusic();
+                            
+                            setTimeout(() => {
+                                accessPage.style.display = 'none';
+                                contractPage.style.display = 'block';
+                                returnBtn.classList.remove('hidden');
+
+                            }, 100);
+                            
+                        }, 80);
+            }
+            function startCountdown() {
+                countdown = 30;
+                timerElement.textContent = countdown;
+                
+                countdownInterval = setInterval(() => {
+                    countdown--;
+                    timerElement.textContent = countdown;
+                    
+                    if (countdown <= 10) {
+                        timerElement.style.color = "#ff0000";
+                    }
+                    
+                    if (countdown <= 0) {
+                        clearInterval(countdownInterval);
+                        statusLine.textContent = "СЕАНС ПРЕРВАН: ТАЙМАУТ";
+                        statusLine.style.color = "#ff0000";
+                        statusLine.style.borderColor = "#880000";
+                        
+                        setTimeout(() => {
+                            authenticate();
+                        }, 2000);
+                    }
+                }, 1000);
+            }
+            
+            function init() {
+
+                loadContractData();
+        
+                startCountdown();
+                
+                continueBtn.addEventListener('click', authenticate);
+                
+                returnBtn.addEventListener('click', function() {
+                    contractPage.style.display = 'none';
+                    accessPage.style.display = 'flex';
+                    returnBtn.classList.add('hidden');
+                    
+                    statusLine.textContent = "СИСТЕМА ГОТОВА К АУТЕНТИФИКАЦИИ";
+                    statusLine.style.color = "#00ff00";
+                    statusLine.style.borderColor = "#008800";
+                    
+                    startCountdown();
+                });
+                setInterval(() => {
+                    if (contractPage.style.display === 'block') {
+                        const now = new Date();
+                        currentDateElement.textContent = formatDate(now);
+                    }
+                }, 60000);
+                
+                console.log("Система доступа инициализирована");
+            }
+            
+            init();
+        });
+    </script>
+</body>
+</html>
